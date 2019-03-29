@@ -17,7 +17,7 @@ public class PlayerSelectable : MonoBehaviour
     {
         if (!Selected)
         {
-            if(PlanetSelection.AddToSelection(gameObject))
+            if(Selection.AddToSelection(gameObject))
             {
                 GlowObject.SetActive(true);
                 Selected = true;
@@ -25,7 +25,7 @@ public class PlayerSelectable : MonoBehaviour
         }
         else if(Selected)
         {
-            if(PlanetSelection.Contains(gameObject))
+            if(Selection.Contains(gameObject))
             {
                 GlowObject.SetActive(false);
                 Selected = false;

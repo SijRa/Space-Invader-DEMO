@@ -30,7 +30,7 @@ public class InvaderMovement : MonoBehaviour {
         {
             if (transform.position == TargetWorld.transform.position)
             {
-                TargetWorld.GetComponent<World>().DecrementPopulation(gameObject.tag);
+                TargetWorld.GetComponent<World>().DecrementPopulation(HomeWorld);
                 Destroy(gameObject);
             }
         }

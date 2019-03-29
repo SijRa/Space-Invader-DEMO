@@ -54,16 +54,16 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\_MK\MKGlowFree\MKGlowFree.cs" />
-     <Compile Include="Assets\AI.cs" />
      <Compile Include="Assets\ArtificialIntelligence.cs" />
      <Compile Include="Assets\CameraMovement.cs" />
      <Compile Include="Assets\Distribution Manager\DistributionManager.cs" />
      <Compile Include="Assets\Distribution Manager\Example.cs" />
+     <Compile Include="Assets\InvaderControl.cs" />
      <Compile Include="Assets\InvaderMovement.cs" />
      <Compile Include="Assets\Level.cs" />
-     <Compile Include="Assets\PlanetAttack.cs" />
-     <Compile Include="Assets\PlanetSelection.cs" />
+     <Compile Include="Assets\Planets.cs" />
      <Compile Include="Assets\PlayerSelectable.cs" />
+     <Compile Include="Assets\Selection.cs" />
      <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
      <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
      <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />

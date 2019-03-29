@@ -52,7 +52,7 @@ namespace MK.Glow
         [MenuItem("Window/MK/Glow/Add MK Glow Free To Selection")]
         private static void AddMKGlowToObject()
         {
-            foreach (GameObject obj in Selection.gameObjects)
+            foreach (GameObject obj in UnityEditor.Selection.gameObjects)
             {
                 if (obj.GetComponent<MKGlowFree>() == null)
                     obj.AddComponent<MKGlowFree>();
