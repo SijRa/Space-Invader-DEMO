@@ -27,18 +27,18 @@ public class World : MonoBehaviour
         PopulationCounter = transform.GetComponentInChildren<TextMeshPro>();
         StartCoroutine(StartPopulating(populationRate));
 
-        Red = new Color(255,0,0);
-        Blue = new Color(0,0,255);
+        Red = new Color(255, 0, 0);
+        Blue = new Color(0, 0, 255);
         Green = new Color(0, 255, 0);
         Yellow = new Color(255, 255, 0);
 
-        if(transform.parent.name != "HomeWorlds")
+        if (transform.parent.name != "HomeWorlds")
         {
             transform.tag = "White";
         }
 
         World worldScript = GetComponent<World>();
-        
+
         switch (transform.tag)
         {
             case "Red":
@@ -91,8 +91,8 @@ public class World : MonoBehaviour
                 Planets.GreenPlanets.Add(_HomeWorld.transform);
                 break;
         }
-        var aiScript =_HomeWorld.GetComponent<ArtificialIntelligence>();
-        if(aiScript)
+        var aiScript = _HomeWorld.GetComponent<ArtificialIntelligence>();
+        if (aiScript)
         {
             aiScript.UpdateWorldLists();
         }
@@ -116,22 +116,28 @@ public class World : MonoBehaviour
         }
     }
 
-    public void DecrementPopulation(GameObject _HomeWorld)
+    public void DecrementPopulation(GameObject _HomeWorld, string tagCopy)
     {
-        if(transform.tag != _HomeWorld.tag)
+        if (transform.tag != tagCopy)
         {
             WorldPopulation--;
-            if(WorldPopulation < 0)
+            if (WorldPopulation < 0)
             {
+                ArtificialIntelligence aiScript = gameObject.GetComponent<ArtificialIntelligence>();
+                if (aiScript)
+                {
+                    Destroy(aiScript);
+                }
+
                 ChangeAllegiance(_HomeWorld);
                 //give ai powers
-                if(Tag != "Red")
+                if (Tag != "Red")
                 {
-                    var aiScript = gameObject.AddComponent<ArtificialIntelligence>();
+                    gameObject.AddComponent<ArtificialIntelligence>();
                 }
             }
         }
-        else
+        if (transform.tag == tagCopy)
         {
             WorldPopulation++;
         }

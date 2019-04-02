@@ -9,7 +9,9 @@ public class ArtificialIntelligence : MonoBehaviour {
 
     int WaitMinimum = 1;
     int WaitMaximum = 10;
-    
+
+    float TargetChangeProbability = 0.4f;
+
     // Use this for initialization
     void Start () {
         if (Worlds == null)
@@ -25,22 +27,21 @@ public class ArtificialIntelligence : MonoBehaviour {
 
     void CleanHostileList()
     {
-        List<string> PlayableWorlds = new List<string>(new string[] {});
-        List<int> SameTagList = new List<int>();
+        List<int> unknownTags = new List<int>();
         int counter = 0;
         foreach (var world in HostileWorldList)
         {
-            if (world.tag == gameObject.tag)
+            if(world.tag == "Untagged")//Non-playing objects
             {
-                SameTagList.Add(counter);
+                unknownTags.Add(counter);
             }
-            if(world.tag != "Red")
+            else if(world.tag == gameObject.tag)//Exclude self
             {
-
+                unknownTags.Add(counter);
             }
             counter++;
         }
-        foreach (int index in SameTagList)
+        foreach (int index in unknownTags)
         {
             HostileWorldList[index] = null;
         }
@@ -77,77 +78,123 @@ public class ArtificialIntelligence : MonoBehaviour {
     IEnumerator StartPlaying()
     {
         Debug.Log(transform.name + " Started Playing");
-        while (true)
+        if (transform.tag != "Red")
         {
-            int waitTime = Random.Range(WaitMinimum,WaitMaximum);
-            //Debug.Log(transform.name + " Wait-Time: " + waitTime);
-            int randomNum = Random.Range(1, 3);
-            switch(randomNum)
+            while (true)
             {
-                case 1:
-                    //Attack
-                    Debug.Log(transform.name + " attacking");
-                    StartCoroutine(Attack(HostileWorldList));
-                    break;
-                case 2:
-                    //reinforce
-                    Debug.Log(transform.name + " defending");
+                int waitTime = Random.Range(WaitMinimum, WaitMaximum);
+                //Debug.Log(transform.name + " Wait-Time: " + waitTime);
+                int randomNum = Random.Range(1, 3);
+                switch (randomNum)
+                {
+                    case 1:
+                        //Attack
+                        Debug.Log(transform.name + " attacking");
+                        StartCoroutine(Attack(HostileWorldList));
+                        break;
+                    case 2:
+                        //reinforce
+                        Debug.Log(transform.name + " defending");
 
-                    switch (gameObject.tag)
-                    {
-                        case "Red":
-                            FriendlyWorldList = Planets.RedPlanets;
-                            break;
-                        case "Blue":
-                            FriendlyWorldList = Planets.BluePlanets;
-                            break;
-                        case "Yellow":
-                            FriendlyWorldList = Planets.YellowPlanets;
-                            break;
-                        case "Green":
-                            FriendlyWorldList = Planets.GreenPlanets;
-                            break;
-                    }
-                    if (FriendlyWorldList.Count > 1)
-                    {
-                        StartCoroutine(Attack(FriendlyWorldList.ToArray()));
-                    }
-                    break;
+                        switch (gameObject.tag)
+                        {
+                            case "Red":
+                                FriendlyWorldList = Planets.RedPlanets;
+                                break;
+                            case "Blue":
+                                FriendlyWorldList = Planets.BluePlanets;
+                                break;
+                            case "Yellow":
+                                FriendlyWorldList = Planets.YellowPlanets;
+                                break;
+                            case "Green":
+                                FriendlyWorldList = Planets.GreenPlanets;
+                                break;
+                        }
+                        if (FriendlyWorldList.Count > 1)
+                        {
+                            StartCoroutine(Attack(FriendlyWorldList.ToArray()));
+                        }
+                        break;
+                }
+                yield return new WaitForSeconds(waitTime);
             }
-            yield return new WaitForSeconds(waitTime);
         }
     }
 
     IEnumerator Attack(Transform[] _targetList)
     {
-        Transform World = ClosestWorld(_targetList);
-        World WorldScript = World.GetComponent<World>();
+        Transform[] Worlds = ClosestWorld(_targetList,false);
+        World WorldScript = null;
+        if(Worlds.Length == 1)
+        {
+            WorldScript = Worlds[0].GetComponent<World>();
+        }
+        else
+        {
+            foreach (var world in Worlds)
+            {
+                if(GetComponent<World>().WorldPopulation > world.GetComponent<World>().WorldPopulation)
+                {
+                    WorldScript = world.GetComponent<World>();
+                }
+            }
+        }
         if (WorldScript.WorldPopulation < GetComponent<World>().WorldPopulation)
         {
-            Debug.Log(transform.name + " Moving to " + World.name);
+            Debug.Log(transform.name + " Moving to " + Worlds[0].name);
             //attack
             InvaderControl invaderScript = transform.GetComponent<InvaderControl>();
-            invaderScript.Attack(gameObject,World.gameObject);
+            invaderScript.Attack(gameObject,Worlds[0].gameObject);
         }
         Debug.Log(transform.name + " cannot attack");
         yield return null;
     }
 
-    Transform ClosestWorld(Transform[] targetList)
+    Transform[] ClosestWorld(Transform[] targetList, bool neutralWorlds)
     {
-        Transform bestTarget = null;
+        Transform[] bestTarget = new Transform[1];
         float closestDistanceSqr = Mathf.Infinity;
         Vector3 currentPosition = transform.position;
+        Transform[] secondBest = new Transform[1];
+        List<Transform> PlanetList = new List<Transform>();
         foreach (Transform potentialTarget in targetList)
         {
-            Vector3 directionToTarget = potentialTarget.position - currentPosition;
-            float dSqrToTarget = directionToTarget.sqrMagnitude;
-            if (dSqrToTarget < closestDistanceSqr)
+            if(potentialTarget != null)
             {
-                closestDistanceSqr = dSqrToTarget;
-                bestTarget = potentialTarget;
+                Vector3 directionToTarget = potentialTarget.position - currentPosition;
+                float dSqrToTarget = directionToTarget.sqrMagnitude;
+                if (dSqrToTarget < closestDistanceSqr)
+                {
+                    closestDistanceSqr = dSqrToTarget;
+                    secondBest[0] = potentialTarget;
+                    bestTarget[0] = potentialTarget;
+                    if(neutralWorlds)
+                    {
+                        PlanetList.Add(potentialTarget);
+                    }
+                }
             }
         }
+        Transform[] PlanetListArray = PlanetList.ToArray();
+        int randomCount = Random.Range(PlanetList.Count-5,PlanetList.Count-2);//SELECT CLOSEST LAST 3 - 5 WORLDS
+        List<Transform> OtherPlanets = new List<Transform>();
+        for (int i = PlanetList.Count - randomCount; i < PlanetList.Count - 2; i++)
+        {
+            OtherPlanets.Add(PlanetListArray[i]);
+        }
+        //PRODUCT OF MARAJUANA
+        int randomNum = Random.Range(1,9);
+        float randomFloat = 1 - (randomNum / 100);
+        if (randomFloat < TargetChangeProbability)
+        {
+            return secondBest;
+        }
+        else if(randomFloat < 0.3f)
+        {
+            return OtherPlanets.ToArray();
+        }
+        //PRODUCT OF MARAJUANA
 
         return bestTarget;
     }

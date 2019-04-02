@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Planets : MonoBehaviour {
 
@@ -14,15 +15,19 @@ public class Planets : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+    }
+
+    void Awake()
+    {
         PlanetList = new List<Transform>();
         RedPlanets = new List<Transform>();
         BluePlanets = new List<Transform>();
         GreenPlanets = new List<Transform>();
         YellowPlanets = new List<Transform>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    }
+
+    // Update is called once per frame
+    void Update () {
 		
 	}
 }
